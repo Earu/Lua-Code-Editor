@@ -1,0 +1,15 @@
+{
+  "title": "Lua Code Editor",
+  "type": "tool",
+  "tags": [ "build", "fun" ],
+  "ignore": [
+    "*.psd",
+    "*.vcproj",
+    "*.svn*",
+    "*.md",
+	".git/*",
+	".gitignore",
+	"update.bat",
+	".gma"
+  ]
+}
