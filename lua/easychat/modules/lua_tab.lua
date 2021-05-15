@@ -714,7 +714,7 @@ if CLIENT then
 				self.LblRunStatus:SetText(("%sReady"):format((" "):rep(3)))
 				local safe_code = code:JavascriptSafe()
 				editor:QueueJavascript([[gmodinterface.SetCode(`]] .. safe_code .. [[`);]])
-				--editor:QueueJavascript([[gmodinterface.SetTheme(`chromedevtools`);]])
+				editor:QueueJavascript([[gmodinterface.LoadAutocompleteState(`Shared`);]])
 
 				if tab == self.CodeTabs:GetActiveTab() then
 					editor:RequestFocus()
