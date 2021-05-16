@@ -2,7 +2,8 @@
 title Lua Code Editor Update
 set /p changes="Changes: "
 
-git commit -a -m "%changes%"
+git add *
+git commit -m "%changes%"
 git push
 
 gmad.exe create -folder "./" -out ".gma"
