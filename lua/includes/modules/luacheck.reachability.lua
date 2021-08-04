@@ -47,11 +47,9 @@ function reachability(chstate, line, nested)
    core_utils.walk_line_once(line, reachable_indexes, 1, reachability_callback, chstate, nested)
 
    for i, item in ipairs(line.items) do
-      if not reachable_indexes[i] then
-         if item.location then
-            chstate:warn_unreachable(item.location, item.loop_end, item.token)
-            core_utils.walk_line_once(line, reachable_indexes, i, noop_callback)
-         end
+      if not reachable_indexes[i] and item.location then
+         chstate:warn_unreachable(item.location, item.loop_end, item.token)
+         core_utils.walk_line_once(line, reachable_indexes, i, noop_callback)
       end
    end
 end

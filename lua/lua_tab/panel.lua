@@ -35,8 +35,6 @@ local LUA_TAB = {
 	},
 	Env = "self",
 	Init = function(self)
-		local frame = self
-
 		self.MenuBar = self:Add("DMenuBar")
 		self.MenuBar:Dock(NODOCK)
 		self.MenuBar:DockPadding(5, 0, 0, 0)
@@ -66,13 +64,6 @@ local LUA_TAB = {
 		table.insert(options, self.MenuTools:AddOption("Send Code", function()
 			timer.Simple(0, function() self:SendCode() end)
 		end))
-
-		local function build_env_icon(mat_path)
-			local img = vgui.Create("DImage")
-			img:SetMaterial(Material(mat_path))
-
-			return img
-		end
 
 		self.EnvSelector = self.MenuBar:Add("DComboBox")
 		self.EnvSelector:SetSize(100, 20)
@@ -159,16 +150,14 @@ local LUA_TAB = {
 				return
 			end
 
-			if self:IsMenuOpen() then
-				if not self.Menu.CustomPainted then
-					self.Menu.Paint = menu_paint
-					for i=1, self.Menu:ChildCount() do
-						local option = self.Menu:GetChild(i)
-						option:SetTextColor(color_white)
-						option.Paint = option_paint
-					end
-					self.Menu.CustomPainted = true
+			if self:IsMenuOpen() and not self.Menu.CustomPainted then
+				self.Menu.Paint = menu_paint
+				for i = 1, self.Menu:ChildCount() do
+					local option = self.Menu:GetChild(i)
+					option:SetTextColor(color_white)
+					option.Paint = option_paint
 				end
+				self.Menu.CustomPainted = true
 			end
 		end
 
@@ -629,7 +618,7 @@ local LUA_TAB = {
 		end
 		local old_editor_paint = editor.Paint
 		editor.Paint = function(editor, w, h)
-			if not tab == self.CodeTabs:GetActiveTab() then return end
+			if tab ~= self.CodeTabs:GetActiveTab() then return end
 
 			surface.DisableClipping(true)
 			surface.SetDrawColor(blue_color)

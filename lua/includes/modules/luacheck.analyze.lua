@@ -125,12 +125,10 @@ local function closure_propogation_callback(line, _, item, subline)
    if live_values then
       for _, var_map in ipairs({subline.accessed_upvalues, subline.mutated_upvalues}) do
          for var, accessing_items in pairs(var_map) do
-            if var.line == line then
-               if live_values[var] then
-                  for _, accessing_item in ipairs(accessing_items) do
-                     for _, value in ipairs(live_values[var]) do
-                        add_resolution(subline, accessing_item, var, value, var_map == subline.mutated_upvalues)
-                     end
+            if var.line == line and live_values[var] then
+               for _, accessing_item in ipairs(accessing_items) do
+                  for _, value in ipairs(live_values[var]) do
+                     add_resolution(subline, accessing_item, var, value, var_map == subline.mutated_upvalues)
                   end
                end
             end
@@ -147,11 +145,9 @@ local function closure_propogation_callback(line, _, item, subline)
 
       if item_var_map then
          for var, setting_items in pairs(subline.set_upvalues) do
-            if var.line == line then
-               if item_var_map[var] then
-                  for _, setting_item in ipairs(setting_items) do
-                     add_resolution(line, item, var, setting_item.set_variables[var], action_key == "mutations")
-                  end
+            if var.line == line and item_var_map[var] then
+               for _, setting_item in ipairs(setting_items) do
+                  add_resolution(line, item, var, setting_item.set_variables[var], action_key == "mutations")
                end
             end
          end

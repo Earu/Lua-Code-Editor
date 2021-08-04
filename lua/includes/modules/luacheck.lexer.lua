@@ -31,9 +31,9 @@ local function to_hex(b)
    if BYTE_0 <= b and b <= BYTE_9 then
       return b-BYTE_0
    elseif BYTE_a <= b and b <= BYTE_f then
-      return 10+b-BYTE_a
+      return 10 + b-BYTE_a
    elseif BYTE_A <= b and b <= BYTE_F then
-      return 10+b-BYTE_A
+      return 10 + b-BYTE_A
    else
       return nil
    end
@@ -56,12 +56,12 @@ local function to_utf(codepoint)
    local mfb = 0x3F
 
    repeat
-      buf[#buf+1] = schar(codepoint % 0x40 + 0x80)
+      buf[#buf + 1] = schar(codepoint % 0x40 + 0x80)
       codepoint = mfloor(codepoint / 0x40)
       mfb = mfloor(mfb / 2)
    until codepoint <= mfb
 
-   buf[#buf+1] = schar(0xFE - mfb*2 + codepoint)
+   buf[#buf + 1] = schar(0xFE - mfb * 2 + codepoint)
    return sreverse(tconcat(buf))
 end
 
@@ -98,7 +98,7 @@ local simple_escapes = {
 
 local function next_byte(state, inc)
    inc = inc or 1
-   state.offset = state.offset+inc
+   state.offset = state.offset + inc
    return sbyte(state.src, state.offset)
 end
 
@@ -112,7 +112,7 @@ local function skip_newline(state, newline)
       b = next_byte(state)
    end
 
-   state.line = state.line+1
+   state.line = state.line + 1
    state.line_offset = state.offset
    return b
 end
@@ -166,7 +166,7 @@ local function lex_long_string(state, opening_long_bracket, token)
    while true do
       if is_newline(b) then
          -- Add the finished line.
-         lines[#lines+1] = ssub(state.src, line_start, state.offset-1)
+         lines[#lines + 1] = ssub(state.src, line_start, state.offset-1)
 
          b = skip_newline(state, b)
          line_start = state.offset
@@ -185,7 +185,7 @@ local function lex_long_string(state, opening_long_bracket, token)
    end
 
    -- Add last line.
-   lines[#lines+1] = ssub(state.src, line_start, state.offset-opening_long_bracket-2)
+   lines[#lines + 1] = ssub(state.src, line_start, state.offset-opening_long_bracket-2)
    next_byte(state)
    return token, tconcat(lines, "\n")
 end
@@ -206,7 +206,7 @@ local function lex_short_string(state, quote)
 
          -- Put previous chunk into buffer.
          if chunk_start ~= state.offset then
-            chunks[#chunks+1] = ssub(state.src, chunk_start, state.offset-1)
+            chunks[#chunks + 1] = ssub(state.src, chunk_start, state.offset-1)
          end
 
          b = next_byte(state)
@@ -247,7 +247,7 @@ local function lex_short_string(state, quote)
             end
 
             b = next_byte(state)
-            s = schar(c1*16 + c2)
+            s = schar(c1 * 16 + c2)
          elseif b == BYTE_u then
             b = next_byte(state)  -- Skip "u".
 
@@ -279,7 +279,7 @@ local function lex_short_string(state, quote)
 
                if hex then
                   hexdigits = hexdigits + 1
-                  codepoint = codepoint*16 + hex
+                  codepoint = codepoint * 16 + hex
 
                   if codepoint > 0x10FFFF then
                      -- UTF-8 value too large.
@@ -318,14 +318,14 @@ local function lex_short_string(state, quote)
                local c2 = to_dec(b)
 
                if c2 then
-                  cb = 10*cb + c2
+                  cb = 10 * cb + c2
                   b = next_byte(state)
 
                   if b then
                      local c3 = to_dec(b)
 
                      if c3 then
-                        cb = 10*cb + c3
+                        cb = 10 * cb + c3
 
                         if cb > 255 then
                            return nil, "invalid decimal escape sequence", -3
@@ -341,7 +341,7 @@ local function lex_short_string(state, quote)
          end
 
          if s then
-            chunks[#chunks+1] = s
+            chunks[#chunks + 1] = s
          end
 
          -- Next chunk starts after escape sequence.
@@ -359,7 +359,7 @@ local function lex_short_string(state, quote)
    if chunks then
       -- Put last chunk into buffer.
       if chunk_start ~= state.offset then
-         chunks[#chunks+1] = ssub(state.src, chunk_start, state.offset-1)
+         chunks[#chunks + 1] = ssub(state.src, chunk_start, state.offset-1)
       end
 
       string_value = tconcat(chunks)
@@ -445,7 +445,7 @@ local function lex_number(state, b)
       if not is_float then
          if b == BYTE_u or b == BYTE_U then
             -- It may be uint64_t literal.
-            local b1, b2 = sbyte(state.src, state.offset+1, state.offset+2)
+            local b1, b2 = sbyte(state.src, state.offset + 1, state.offset + 2)
 
             if (b1 == BYTE_l or b1 == BYTE_L) and (b2 == BYTE_l or b2 == BYTE_L) then
                -- It is uint64_t literal.
@@ -453,7 +453,7 @@ local function lex_number(state, b)
             end
          elseif b == BYTE_l or b == BYTE_L then
             -- It may be uint64_t or int64_t literal.
-            local b1, b2 = sbyte(state.src, state.offset+1, state.offset+2)
+            local b1, b2 = sbyte(state.src, state.offset + 1, state.offset + 2)
 
             if b1 == BYTE_l or b1 == BYTE_L then
                if b2 == BYTE_u or b2 == BYTE_U then
@@ -647,15 +647,15 @@ local byte_handlers = {
    [BYTE_LDASH] = lex_ident
 }
 
-for b=BYTE_0, BYTE_9 do
+for b = BYTE_0, BYTE_9 do
    byte_handlers[b] = lex_number
 end
 
-for b=BYTE_a, BYTE_z do
+for b = BYTE_a, BYTE_z do
    byte_handlers[b] = lex_ident
 end
 
-for b=BYTE_A, BYTE_Z do
+for b = BYTE_A, BYTE_Z do
    byte_handlers[b] = lex_ident
 end
 
