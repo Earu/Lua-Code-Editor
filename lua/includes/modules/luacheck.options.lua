@@ -99,10 +99,8 @@ function options.validate(option_set, opts)
       assert(type(opts) == "table")
 
       for _, option in ipairs(option_set) do
-         if opts[option] ~= nil then
-            if not option_set[option](opts[option]) then
-               return false, option
-            end
+         if opts[option] ~= nil and not option_set[option](opts[option]) then
+            return false, option
          end
       end
 
@@ -348,11 +346,9 @@ local function get_rules(opts_stack)
       for _, macro_info in ipairs(macros) do
          local option, pattern = macro_info[1], macro_info[2]
 
-         if not used_macros[option] then
-            if opts[option] ~= nil then
-               table.insert(rules, {{pattern}, opts[option] and "enable" or "disable"})
-               used_macros[option] = true
-            end
+         if not used_macros[option] and opts[option] ~= nil then
+            table.insert(rules, {{pattern}, opts[option] and "enable" or "disable"})
+            used_macros[option] = true
          end
       end
 

@@ -250,11 +250,9 @@ local function get_field_status(opts, warning, depth)
             end
          else
             -- The field is not defined, but it may be okay to index if `other_fields` is true.
-            if not def.other_fields then
-               if not t then
-                 defined = false
-                 break
-               end
+            if not def.other_fields and not t then
+               defined = false
+               break
             end
          end
       end

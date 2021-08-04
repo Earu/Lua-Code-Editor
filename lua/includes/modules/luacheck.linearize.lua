@@ -580,7 +580,7 @@ local function node_to_lua_value(node)
 
       local number = tonumber(str)
 
-      if number and number == number and number < 1/0 and number > -1/0 then
+      if number and number == number and number < 1 / 0 and number > - 1 / 0 then
          return number, node[1]
       end
    end

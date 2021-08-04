@@ -115,16 +115,12 @@ local function add_fields(def, fields, overwrite, ignore_array_part, default_rea
             new_read_only = default_read_only
          end
 
-         if new_read_only ~= nil then
-            if overwrite or new_read_only == false then
-               existing_field_def.read_only = new_read_only
-            end
+         if new_read_only ~= nil and (overwrite or new_read_only == false) then
+            existing_field_def.read_only = new_read_only
          end
 
-         if field_def.other_fields ~= nil then
-            if overwrite or field_def.other_fields == true then
-               existing_field_def.other_fields = field_def.other_fields
-            end
+         if field_def.other_fields ~= nil and (overwrite or field_def.other_fields == true) then
+            existing_field_def.other_fields = field_def.other_fields
          end
 
          add_fields(existing_field_def, field_def.fields, overwrite, false, nil)

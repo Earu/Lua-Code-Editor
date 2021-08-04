@@ -54,7 +54,7 @@ local function skip_token(state)
       if not state.token then
          parser.syntax_error(state, err_end_column, state.token_value)
       elseif state.token == "comment" then
-         state.comments[#state.comments+1] = {
+         state.comments[#state.comments + 1] = {
             contents = state.token_value,
             location = location(state),
             end_column = state.column + #token_body_or_line(state) - 1
@@ -168,7 +168,7 @@ local function parse_expression_list(state)
    local is_inside_parentheses
 
    repeat
-      list[#list+1], is_inside_parentheses = parse_expression(state)
+      list[#list + 1], is_inside_parentheses = parse_expression(state)
    until not test_and_skip_token(state, ",")
 
    opt_add_parens(list, is_inside_parentheses)
@@ -227,7 +227,7 @@ simple_expressions["{"] = function(state)
                -- `name` is beginning of an expression in array part.
                -- Backtrack lexer to before name.
                state.lexer.line = item_location.line
-               state.lexer.line_offset = item_location.offset-item_location.column+1
+               state.lexer.line_offset = item_location.offset-item_location.column + 1
                state.lexer.offset = item_location.offset
                skip_token(state)  -- Load name again.
                rhs, is_inside_parentheses = parse_expression(state, nil, true)
@@ -248,10 +248,10 @@ simple_expressions["{"] = function(state)
 
          if lhs then
             -- Pair.
-            ast_node[#ast_node+1] = init_ast_node({lhs, rhs, first_token = first_key_token}, item_location, "Pair")
+            ast_node[#ast_node + 1] = init_ast_node({lhs, rhs, first_token = first_key_token}, item_location, "Pair")
          else
             -- Array part item.
-            ast_node[#ast_node+1] = rhs
+            ast_node[#ast_node + 1] = rhs
          end
       end
    until not (test_and_skip_token(state, ",") or test_and_skip_token(state, ";"))
@@ -270,9 +270,9 @@ local function parse_function(state, func_location)
    if state.token ~= ")" then  -- Are there arguments?
       repeat
          if state.token == "name" then
-            args[#args+1] = parse_id(state)
+            args[#args + 1] = parse_id(state)
          elseif state.token == "..." then
-            args[#args+1] = simple_expressions["..."](state)
+            args[#args + 1] = simple_expressions["..."](state)
             break
          else
             parse_error(state, "expected argument")
@@ -482,10 +482,10 @@ statements["if"] = function(state, loc)
    local ast_node = init_ast_node({}, loc, "If")
 
    repeat
-      ast_node[#ast_node+1] = parse_expression(state, "condition", true)
+      ast_node[#ast_node + 1] = parse_expression(state, "condition", true)
       local branch_location = location(state)
       check_and_skip_token(state, "then")
-      ast_node[#ast_node+1] = parse_block(state, branch_location)
+      ast_node[#ast_node + 1] = parse_block(state, branch_location)
       start_line, start_token = next_line, next_token
       next_line, next_token = state.line, state.token
    until not test_and_skip_token(state, "elseif")
@@ -494,7 +494,7 @@ statements["if"] = function(state, loc)
       start_line, start_token = next_line, next_token
       local branch_location = location(state)
       skip_token(state)
-      ast_node[#ast_node+1] = parse_block(state, branch_location)
+      ast_node[#ast_node + 1] = parse_block(state, branch_location)
    end
 
    check_closing_token(state, start_token, "end", start_line)
@@ -533,14 +533,14 @@ statements["for"] = function(state, loc)
       end
 
       check_and_skip_token(state, "do")
-      ast_node[#ast_node+1] = parse_block(state)
+      ast_node[#ast_node + 1] = parse_block(state)
    elseif state.token == "," or state.token == "in" then
       -- Generic "for" loop.
       ast_node.tag = "Forin"
 
       local iter_vars = {first_var}
       while test_and_skip_token(state, ",") do
-         iter_vars[#iter_vars+1] = parse_id(state)
+         iter_vars[#iter_vars + 1] = parse_id(state)
       end
 
       ast_node[1] = iter_vars
@@ -600,7 +600,7 @@ statements["local"] = function(state, loc)
    local rhs
 
    repeat
-      lhs[#lhs+1] = parse_id(state)
+      lhs[#lhs + 1] = parse_id(state)
    until not test_and_skip_token(state, ",")
 
    local equals_location = location(state)
@@ -686,7 +686,7 @@ local function parse_expression_statement(state, loc)
 
       -- This is an assignment.
       lhs = lhs or {}
-      lhs[#lhs+1] = primary_expression
+      lhs[#lhs + 1] = primary_expression
    until not test_and_skip_token(state, ",")
 
    local equals_location = location(state)
@@ -727,7 +727,7 @@ function parse_block(state, loc)
          local statement = parse_statement(state)
          after_statement = true
          statement.first_token = first_token
-         block[#block+1] = statement
+         block[#block + 1] = statement
 
          if first_token == "return" then
             -- "return" must be the last statement.

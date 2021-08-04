@@ -152,7 +152,7 @@ end
 -- "{field_name!}" marker adds highlight or quoting depending on color
 -- option.
 local function substitute(string_format, values, color)
-   return (string_format:gsub("{([_a-zA-Z0-9]+)(!?)}", function(field_name, highlight)
+   local ret = (string_format:gsub("{([_a-zA-Z0-9]+)(!?)}", function(field_name, highlight)
       local value = tostring(assert(values[field_name], "No field " .. field_name))
 
       if highlight == "!" then
@@ -165,6 +165,8 @@ local function substitute(string_format, values, color)
          return value
       end
    end))
+
+   return ret
 end
 
 local function format_message(event, color)
@@ -210,12 +212,12 @@ local function format_file_report_header(report, file_name, opts)
       local warnings, errors = count_warnings_errors(report)
 
       if warnings > 0 then
-         status = format_color(tostring(warnings).." warning"..plural(warnings), opts.color, "bright", "red")
+         status = format_color(tostring(warnings) .. " warning" .. plural(warnings), opts.color, "bright", "red")
       end
 
       if errors > 0 then
-         status = status and (status.." / ") or ""
-         status = status..(format_color(tostring(errors).." error"..plural(errors), opts.color, "bright"))
+         status = status and (status .. " / ") or ""
+         status = status .. (format_color(tostring(errors) .. " error" .. plural(errors), opts.color, "bright"))
       end
    end
 
@@ -233,7 +235,7 @@ local function format_location(file, location, opts)
 end
 
 local function event_code(event)
-   return (event.code:sub(1, 1) == "0" and "E" or "W")..event.code
+   return (event.code:sub(1, 1) == "0" and "E" or "W") .. event.code
 end
 
 local function format_event(file_name, event, opts)
@@ -298,7 +300,7 @@ function formatters.default(report, file_names, opts)
       #report - report.fatals, plural(#report - report.fatals))
 
    if report.fatals > 0 then
-      total = total..(", couldn't check %s file%s"):format(
+      total = total .. (", couldn't check %s file%s"):format(
          report.fatals, plural(report.fatals))
    end
 
