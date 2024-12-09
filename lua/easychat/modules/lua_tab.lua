@@ -11,9 +11,16 @@ if SERVER then
 	include("lua_tab/luadev_compat.lua")
 
 	util.AddNetworkString(NET_LUA_SEND_CODE)
+
+	local player_cooldowns = {}
 	net.Receive(NET_LUA_SEND_CODE, function(_, ply)
+		local last_use = player_cooldowns[ply] or 0
+		if (CurTime() - last_use) < 10 then return end
+
 		local url = net.ReadString()
 		local target = net.ReadEntity()
+
+		player_cooldowns[ply] = CurTime()
 
 		timer.Simple(0, function()
 			net.Start(NET_LUA_SEND_CODE)
@@ -21,6 +28,10 @@ if SERVER then
 			net.WriteEntity(ply)
 			net.Send(target)
 		end)
+	end)
+
+	hook.Add("PlayerDisconnected", "EasyChatModuleLuaTabCooldown", function(ply)
+		player_cooldowns[ply] = nil
 	end)
 end
 
